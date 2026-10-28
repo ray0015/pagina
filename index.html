@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<title>IDScan Pro · La Orden</title>
+<style>
+    :root {
+        --bg: #0b0f19; /* Fondo oscuro elegante por defecto */
+        --surface: #151c2c;
+        --surface-2: #1e293b;
+        --border: #2a3a52;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --primary: #8b5cf6; /* Violeta La Orden */
+        --primary-h: #a78bfa;
+        --accent: #06b6d4; /* Cian para contrastes */
+        --success: #10b981;
+        --success-h: #34d399;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --radius: 16px;
+        --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+        --glow: 0 0 20px rgba(139, 92, 246, 0.15);
+    }
+    /* Modo claro (opcional, pero con estilo) */
+    [data-theme="light"] {
+        --bg: #f8fafc;
+        --surface: #ffffff;
+        --surface-2: #f1f5f9;
+        --border: #e2e8f0;
+        --text: #0f172a;
+        --muted: #64748b;
+        --primary: #7c3aed;
+        --primary-h: #8b5cf6;
+        --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+        --glow: 0 0 20px rgba(124, 58, 237, 0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: var(--bg);
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.1) 0px, transparent 50%);
+        background-attachment: fixed;
+        color: var(--text);
+        line-height: 1.5;
+        min-height: 100vh;
+        padding-bottom: 60px;
+        transition: background .3s, color .3s;
+    }
+
+    /* TOPBAR */
+    .topbar {
+        position: sticky; top: 0; z-index: 50;
+        background: rgba(11, 15, 25, 0.7);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+    }
+    [data-theme="light"] .topbar { background: rgba(255, 255, 255, 0.8); }
+    
+    .topbar-inner {
+        max-width: 1100px; margin: 0 auto;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
+    .brand-logo {
+        width: 38px; height: 38px; border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        display: grid; place-items: center; color: #fff; font-size: 20px;
+        box-shadow: var(--glow);
+    }
+    .brand small {
+        display: block; font-size: 10px; font-weight: 600; color: var(--muted);
+        letter-spacing: 0.15em; text-transform: uppercase; margin-top: 2px;
+    }
+    .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+    /* LAYOUT */
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media(max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* CARDS */
+    .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 24px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: 0 15px 40px -10px rgba(0,0,0,0.6); }
+    .card-head {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex; align-items: center; justify-content: space-between;
+        background: rgba(255,255,255,0.02);
+    }
+    .card-head h2 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .card-body { padding: 22px; }
+
+    /* BOTONES */
+    .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 11px 20px; border: 1px solid transparent; border-radius: 12px;
+        font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+        background: linear-gradient(135deg, var(--primary), var(--primary-h));
+        color: #fff;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
+    .btn:active:not(:disabled) { transform: translateY(0); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+    
+    .btn-ghost {
+        background: transparent; color: var(--text);
+        border-color: var(--border);
+        box-shadow: none;
+    }
+    .btn-ghost:hover:not(:disabled) { background: var(--surface-2); color: var(--text); border-color: var(--muted); }
+    
+    .btn-success { background: linear-gradient(135deg, var(--success), var(--success-h)); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+    .btn-success:hover:not(:disabled) { box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); }
+    
+    .btn-sm { padding: 8px 14px; font-size: 12px; border-radius: 10px; }
+    .btn-icon {
+        padding: 8px; width: 38px; height: 38px; border-radius: 12px;
+        background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+        font-size: 16px;
+    }
+    .btn-icon:hover { background: var(--border); }
+
+    /* CÁMARA */
+    .video-frame {
+        position: relative; border-radius: 14px; overflow: hidden; background: #000;
+        aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center;
+        border: 1px solid var(--border);
+    }
+    #video { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .video-placeholder {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        color: var(--muted); gap: 12px; font-size: 13px;
+    }
+    .video-placeholder .big-icon { font-size: 48px; opacity: 0.4; }
+    .scan-line {
+        position: absolute; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        box-shadow: 0 0 15px var(--accent);
+        animation: scan 2s ease-in-out infinite; display: none;
+    }
+    .video-frame.active .scan-line { display: block; }
+    @keyframes scan { 0% { top: 10%; opacity: 0.3; } 50% { top: 90%; opacity: 1; } 100% { top: 10%; opacity: 0.3; } }
+
+    /* DROP ZONE */
+    .drop-zone {
+        margin-top: 16px; border: 2px dashed var(--border); border-radius: 14px;
+        padding: 28px 16px; text-align: center; cursor: pointer; transition: all 0.2s;
+        background: var(--surface-2);
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+        border-color: var(--primary); background: rgba(139, 92, 246, 0.05);
+    }
+    .drop-zone .big-icon { font-size: 32px; margin-bottom: 10px; }
+    .drop-zone p { font-size: 13px; color: var(--muted); }
+    .drop-zone strong { color: var(--primary); }
+    input[type="file"] { display: none; }
+
+    /* FORMULARIO */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+    .field label {
+        display: flex; flex-direction: column; gap: 6px;
+        font-size: 11px; font-weight: 700; color: var(--muted);
+        text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .field input, .field select {
+        padding: 11px 14px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 13px; font-family: inherit;
+        background: var(--surface-2);
+        color: var(--text);
+        transition: border-color 0.2s, box-shadow 0.2s;
+        width: 100%;
+    }
+    .field input:focus, .field select:focus {
+        outline: none; border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        background: var(--surface);
+    }
+    .field input.invalid { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15); }
+    .field input[readonly] { background: transparent; border-color: transparent; color: var(--muted); cursor: default; }
+    .field.full { grid-column: 1 / -1; }
+    
+    .group-title {
+        grid-column: 1 / -1; font-size: 12px; font-weight: 800; color: var(--accent);
+        text-transform: uppercase; letter-spacing: 0.08em;
+        padding: 16px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 8px;
+    }
+    .group-title:first-child { padding-top: 0; }
+
+    /* ESTADO */
+    .status {
+        display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 12px;
+        font-size: 12px; font-weight: 500; background: var(--surface-2);
+        border: 1px solid var(--border); color: var(--muted); margin-top: 16px;
+    }
+    .status.active { background: rgba(139, 92, 246, 0.1); color: var(--primary); border-color: rgba(139, 92, 246, 0.3); }
+    .status.ok { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+    .status.err { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+
+    /* BADGE */
+    .badge {
+        display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+        border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+        text-transform: uppercase; background: rgba(6, 182, 212, 0.15); color: var(--accent);
+        border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .btn-row .btn { flex: 1; min-width: 140px; }
+
+    /* PREVIEW CÓDIGO */
+    .barcode-preview {
+        margin-top: 18px; padding: 24px; background: #fff; border-radius: 14px;
+        text-align: center; border: 1px solid var(--border); display: none;
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .barcode-preview canvas { max-width: 100%; height: auto; }
+    
+    details { margin-top: 18px; }
+    details summary {
+        cursor: pointer; font-size: 12px; font-weight: 600; color: var(--muted);
+        padding: 8px 0; user-select: none;
+    }
+    details summary:hover { color: var(--text); }
+    details pre {
+        margin-top: 10px; background: #0b0f19; color: #06b6d4; padding: 16px;
+        border-radius: 10px; font-size: 11px; overflow-x: auto;
+        font-family: 'Fira Code', ui-monospace, monospace;
+        white-space: pre-wrap; word-break: break-all;
+        border: 1px solid var(--border);
+    }
+
+    /* HISTORIAL */
+    .history-list { display: flex; flex-direction: column; gap: 10px; }
+    .history-item {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px 16px; background: var(--surface-2); border-radius: 12px;
+        border: 1px solid var(--border); font-size: 13px;
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    .history-item:hover { border-color: var(--primary); transform: translateX(4px); }
+    .history-item .meta { color: var(--muted); font-size: 11px; margin-top: 4px; }
+    .history-item .name { font-weight: 700; color: var(--text); }
+    .history-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 30px; }
+
+    /* TOASTS */
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
+    .toast {
+        background: var(--surface); border: 1px solid var(--border);
+        border-left: 4px solid var(--primary); border-radius: 12px; padding: 14px 18px;
+        box-shadow: var(--shadow); font-size: 13px; font-weight: 500;
+        min-width: 250px; max-width: 380px; animation: slideIn 0.3s ease;
+        display: flex; align-items: center; gap: 12px;
+    }
+    .toast.success { border-left-color: var(--success); }
+    .toast.error { border-left-color: var(--danger); }
+    .toast.warning { border-left-color: var(--warning); }
+    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOut { to { transform: translateX(120%); opacity: 0; } }
+
+    /* TABS */
+    .tabs { display: flex; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
+    .tab {
+        padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+        cursor: pointer; border: none; background: transparent; color: var(--muted);
+        font-family: inherit; transition: all 0.15s;
+    }
+    .tab.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    
+    .spinner {
+        display: inline-block; width: 14px; height: 14px;
+        border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+        border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: -2px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    #pasteInput {
+        width: 100%; padding: 14px; border: 1px solid var(--border);
+        border-radius: 12px; font-family: 'Fira Code', ui-monospace, monospace; font-size: 12px;
+        background: var(--surface-2); color: var(--text); resize: vertical; white-space: pre;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #pasteInput:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); }
+
+    /* FOOTER */
+    .footer {
+        text-align: center; margin-top: 40px; padding-top: 20px;
+        border-top: 1px solid var(--border); color: var(--muted); font-size: 12px;
+    }
+    .footer strong { color: var(--primary); font-weight: 800; letter-spacing: 0.05em; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="topbar-inner">
+        <div class="brand">
+            <div class="brand-logo">🪪</div>
+            <div>
+                IDScan Pro
+                <small>Powered by <strong>La Orden</strong></small>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <span class="badge" id="iinBadge">IIN 636015</span>
+            <button class="btn btn-icon" id="themeToggle" title="Tema">🌙</button>
+        </div>
+    </div>
+</header>
+
+<div class="wrap">
+    <div class="grid-2">
+        <!-- LECTOR -->
+        <div class="card">
+            <div class="card-head">
+                <h2><span class="icon">📷</span> Leer Licencia</h2>
+                <div class="tabs">
+                    <button class="tab active" data-source="camera">Cámara</button>
+                    <button class="tab" data-source="file">Foto</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="cameraPane">
+                    <div class="video-frame" id="videoFrame">
+                        <video id="video" autoplay muted playsinline></video>
+                        <div class="video-placeholder" id="videoPlaceholder">
+                            <div class="big-icon">📹</div><p>La cámara está apagada</p>
+                        </div>
+                        <div class="scan-line"></div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn" id="startBtn">▶ Iniciar cámara</button>
+                        <button class="btn btn-ghost" id="stopBtn" disabled>⏹ Detener</button>
+                    </div>
+                </div>
+                <div id="filePane" style="display:none">
+                    <div class="drop-zone" id="dropZone">
+                        <div class="big-icon">🖼️</div>
+                        <p><strong>Haz clic o arrastra</strong> una foto del código de barras</p>
+                        <p style="font-size:11px; margin-top:6px; color:var(--muted);">PDF417 · PNG, JPG, WEBP</p>
+                        <input type="file" id="fileInput" accept="image/*">
+                    </div>
+                </div>
+                <div class="status" id="readStatus">Esperando escaneo…</div>
+            </div>
+        </div>
+
+        <!-- RESULTADO -->
+        <div class="card">
+            <div class="card-head">
+                <h2><span class="icon">📋</span> Datos leídos</h2>
+                <button class="btn btn-ghost btn-sm" id="clearReadBtn">Limpiar</button>
+            </div>
+            <div class="card-body">
+                <div id="readOutput">
+                    <div class="result-empty" style="text-align:center; padding:30px; color:var(--muted);">
+                        <div style="font-size:36px; opacity:0.5; margin-bottom:10px;">🔍</div>
+                        <p>Los datos de la licencia aparecerán aquí.</p>
+                    </div>
+                </div>
+                <details id="rawDetails" style="display:none">
+                    <summary>Ver texto crudo AAMVA</summary>
+                    <pre id="rawPreview"></pre>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- PEGAR TEXTO -->
+    <div class="card">
+        <div class="card-head">
+            <h2><span class="icon">📋</span> Pegar texto AAMVA</h2>
+            <button class="btn btn-ghost btn-sm" id="clearPasteBtn">Limpiar</button>
+        </div>
+        <div class="card-body">
+            <p style="font-size:13px; color:var(--muted); margin-bottom:12px;">
+                Pega aquí el texto que empieza con <code>ANSI 636...</code> (o directamente los campos <code>DCS</code>, <code>DAC</code>…).
+                Se rellenará el formulario automáticamente.
+            </p>
+            <textarea id="pasteInput" rows="8" placeholder="Pega aquí el texto AAMVA…"></textarea>
+            <div class="btn-row">
+                <button class="btn btn-success" id="parsePasteBtn">🔍 Analizar y rellenar</button>
+                <button class="btn btn-ghost" id="pasteFromClipboardBtn">📋 Pegar del portapapeles</button>
+            </div>
+            <div class="status" id="pasteStatus">Esperando texto…</div>
+        </div>
+    </div>
+
+    <!-- GENERADOR -->
+    <div class="card">
+        <div class="card-head">
+            <h2><span class="icon">✏️</span> Generar PDF417</h2>
+            <div class="topbar-actions">
+                <button class="btn btn-ghost btn-sm" id="exportJsonBtn">⬇ JSON</button>
+                <button class="btn btn-ghost btn-sm" id="importJsonBtn">⬆ Importar</button>
+                <input type="file" id="importJsonInput" accept=".json,application/json">
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="form-grid" id="genForm"></div>
+            <div class="btn-row">
+                <button class="btn btn-success" id="generateBtn">🎨 Generar código</button>
+                <button class="btn btn-ghost" id="downloadBtn" disabled>💾 Descargar PNG</button>
+                <button class="btn btn-ghost" id="printBtn" disabled>🖨 Imprimir</button>
+                <button class="btn btn-ghost" id="saveHistoryBtn" disabled>⭐ Guardar</button>
+            </div>
+            <div class="barcode-preview" id="barcodePreview">
+                <canvas id="barcodeCanvas"></canvas>
+            </div>
+            <details id="payloadDetails" style="display:none">
+                <summary>Ver payload AAMVA generado</summary>
+                <pre id="payloadPreview"></pre>
+            </details>
+        </div>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div class="card">
+        <div class="card-head">
+            <h2><span class="icon">🕘</span> Historial</h2>
+            <button class="btn btn-ghost btn-sm" id="clearHistoryBtn">Borrar todo</button>
+        </div>
+        <div class="card-body">
+            <div class="history-list" id="historyList">
+                <div class="history-empty">No hay licencias guardadas aún.</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FOOTER -->
+    <div class="footer">
+        Hecho con 💜 por <strong>La Orden</strong> &copy; 2024
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bwip-js@4.5.1/dist/bwip-js-min.js"></script>
+
+<script>
+/* ============================================================
+   IDScan Pro — Script principal (blindado)
+   ============================================================ */
+(function () {
+    "use strict";
+
+    console.log("[IDScan] script arrancando");
+
+    const safeStorage = {
+        get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+        set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+        remove(k) { try { localStorage.removeItem(k); } catch {} }
+    };
+
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[c]));
+    }
+
+    function toast(msg, type = "info", ms = 3200) {
+        const container = $("#toastContainer");
+        if (!container) return;
+        const el = document.createElement("div");
+        el.className = "toast " + type;
+        const icons = { success: "✅", error: "❌", warning: "⚠️", info: "ℹ️" };
+        el.innerHTML = `<span>${icons[type] || "ℹ️"}</span><span>${escapeHtml(msg)}</span>`;
+        container.appendChild(el);
+        setTimeout(() => {
+            el.style.animation = "slideOut .3s ease forwards";
+            setTimeout(() => el.remove(), 300);
+        }, ms);
+    }
+
+    function setStatus(msg, type = "") {
+        const el = $("#readStatus");
+        if (el) { el.textContent = msg; el.className = "status " + type; }
+    }
+
+    const AAMVA_FIELDS = {
+        DCS: { label: "Apellido", group: "personal", required: true, maxLength: 40 },
+        DAC: { label: "Nombre", group: "personal", required: true, maxLength: 40 },
+        DAD: { label: "Segundo nombre", group: "personal", maxLength: 40 },
+        DBB: { label: "Fecha nac. (MMDDYYYY)", group: "personal", required: true, maxLength: 8, placeholder: "MMDDYYYY", pattern: /^\d{8}$/, hint: "MMDDYYYY" },
+        DBA: { label: "Fecha exp. (MMDDYYYY)", group: "personal", required: true, maxLength: 8, placeholder: "MMDDYYYY", pattern: /^\d{8}$/, hint: "MMDDYYYY" },
+        DBD: { label: "Fecha emisión (MMDDYYYY)", group: "personal", maxLength: 8, placeholder: "MMDDYYYY", pattern: /^\d{8}$/, hint: "MMDDYYYY" },
+        DBC: { label: "Sexo", group: "personal", maxLength: 1, placeholder: "1 / 2 / 9", pattern: /^[129]$/, hint: "1=M · 2=F · 9=Otro", map: { "1": "Masculino", "2": "Femenino", "9": "Otro" } },
+        DAY: { label: "Color de ojos", group: "personal", maxLength: 3, placeholder: "BRO" },
+        DAU: { label: "Altura", group: "personal", maxLength: 6, placeholder: "066 in", hint: "Ej: 066 in" },
+        DAW: { label: "Peso (lb)", group: "personal", maxLength: 3, placeholder: "125" },
+        DAZ: { label: "Color de cabello", group: "personal", maxLength: 3, placeholder: "BLN" },
+        DCL: { label: "Color de piel", group: "personal", maxLength: 3, placeholder: "W" },
+        DAG: { label: "Calle", group: "direccion", required: true, maxLength: 35, full: true },
+        DAI: { label: "Ciudad", group: "direccion", required: true, maxLength: 20 },
+        DAJ: { label: "Estado", group: "direccion", required: true, maxLength: 2, placeholder: "TX", pattern: /^[A-Z]{2}$/, hint: "2 letras" },
+        DAK: { label: "Código postal", group: "direccion", maxLength: 11, placeholder: "00000" },
+        DCG: { label: "País", group: "direccion", maxLength: 3, placeholder: "USA" },
+        DAQ: { label: "N° de licencia", group: "licencia", required: true, maxLength: 25, full: true },
+        DCF: { label: "Documento", group: "licencia", maxLength: 30, full: true },
+        DCK: { label: "N° de serie", group: "licencia", maxLength: 20 },
+        DDL: { label: "Clase", group: "licencia", maxLength: 2, placeholder: "1" },
+        DDK: { label: "Endosos", group: "licencia", maxLength: 4, placeholder: "1", map: { "NONE": "Ninguno", "N": "Ninguno" } },
+        DDJ: { label: "Restricciones", group: "licencia", maxLength: 4, placeholder: "1", map: { "NONE": "Ninguna" } },
+        DCB: { label: "Restricción adicional", group: "licencia", maxLength: 4 },
+        DCD: { label: "Endosos (DCD)", group: "licencia", maxLength: 6, map: { "NONE": "Ninguno" } },
+        DDA: { label: "Cumplimiento (DDA)", group: "licencia", maxLength: 1, map: { "F": "Federal", "N": "No comercial" } },
+        DDB: { label: "Enmienda / revisión", group: "licencia", maxLength: 8 },
+        DDE: { label: "Sin restricciones (DDE)", group: "licencia", maxLength: 1, map: { "N": "No", "Y": "Sí" } },
+        DDF: { label: "Sin endosos (DDF)", group: "licencia", maxLength: 1, map: { "N": "No", "Y": "Sí" } },
+        DDG: { label: "Sin restricciones 2 (DDG)", group: "licencia", maxLength: 1, map: { "N": "No", "Y": "Sí" } }
+    };
+    const GROUP_LABELS = { personal: "👤 Datos personales", direccion: "🏠 Dirección", licencia: "🪪 Licencia" };
+    const DEFAULT_IIN = "636015";
+    const STORAGE_KEY = "idscanpro_history";
+    const THEME_KEY = "idscanpro_theme";
+
+    let currentIIN = DEFAULT_IIN;
+
+    function applyTheme(t) {
+        document.documentElement.setAttribute("data-theme", t);
+        const btn = $("#themeToggle");
+        if (btn) btn.textContent = t === "dark" ? "☀️" : "🌙";
+        safeStorage.set(THEME_KEY, t);
+    }
+
+    function buildForm() {
+        const container = $("#genForm");
+        if (!container) { console.warn("[IDScan] no existe #genForm"); return; }
+        let html = "";
+        for (const [groupKey, groupLabel] of Object.entries(GROUP_LABELS)) {
+            html += `<div class="group-title">${groupLabel}</div>`;
+            for (const [prefix, info] of Object.entries(AAMVA_FIELDS)) {
+                if (info.group !== groupKey) continue;
+                const fullClass = info.full ? "full" : "";
+                const req = info.required ? 'data-required="true"' : "";
+                const max = info.maxLength ? `maxlength="${info.maxLength}"` : "";
+                const ph = info.placeholder ? `placeholder="${info.placeholder}"` : "";
+                const hint = info.hint ? `<span class="hint" data-hint="${prefix}">${info.hint}</span>` : "";
+                html += `<div class="field ${fullClass}">
+                    <label for="gen_${prefix}">${info.label}${info.required ? " *" : ""}</label>
+                    <input type="text" id="gen_${prefix}" data-prefix="${prefix}" ${req} ${max} ${ph}>
+                    ${hint}
+                </div>`;
+            }
+        }
+        container.innerHTML = html;
+        $$("#genForm input").forEach(input => {
+            input.addEventListener("input", () => validateInput(input));
+            input.addEventListener("blur", () => validateInput(input));
+        });
+        console.log("[IDScan] formulario construido:", $$("#genForm input").length, "inputs");
+    }
+
+    function validateInput(input) {
+        const prefix = input.dataset.prefix;
+        const info = AAMVA_FIELDS[prefix];
+        if (!info) return true;
+        const val = input.value.trim();
+        let ok = true;
+        if (info.required && !val) ok = false;
+        if (val && info.pattern && !info.pattern.test(val)) ok = false;
+        input.classList.toggle("invalid", !ok && val !== "");
+        const hint = $(`[data-hint="${prefix}"]`);
+        if (hint) hint.classList.toggle("error", !ok && val !== "");
+        return ok;
+    }
+
+    function setIIN(iin) {
+        currentIIN = iin;
+        const badge = $("#iinBadge");
+        if (badge) badge.textContent = "IIN " + iin;
+        console.log("[IDScan] IIN =", iin);
+    }
+
+    function parseAAMVA(raw) {
+        const clean = String(raw)
+            .replace(/^\uFEFF/, "")
+            .replace(/\u001e/g, "")
+            .replace(/\u0004/g, "")
+            .replace(/\u0000/g, "")
+            .replace(/\r\n?/g, "\n");
+
+        const lines = clean.split(/\n+/).map(l => l.trim()).filter(Boolean);
+        const data = {};
+        let iin = null;
+
+        for (const line of lines) {
+            const mh = line.match(/^ANSI\s+(\d{6})/);
+            if (mh) { iin = mh[1]; continue; }
+            const m = line.match(/^([A-Z]{3})(.+)$/);
+            if (!m) continue;
+            const prefix = m[1];
+            const value = m[2].trim();
+            if (!data[prefix]) data[prefix] = value;
+        }
+        return { data, iin };
+    }
+
+    function renderRead(data, raw) {
+        const out = $("#readOutput");
+        if (!out) return;
+
+        const grouped = { personal: [], direccion: [], licencia: [] };
+        for (const [prefix, info] of Object.entries(AAMVA_FIELDS)) {
+            if (data[prefix] === undefined) continue;
+            let value = data[prefix];
+            if (info.map && info.map[value] !== undefined) value = info.map[value];
+            if (grouped[info.group]) grouped[info.group].push({ label: info.label, value });
+        }
+
+        let html = "";
+        for (const [g, items] of Object.entries(grouped)) {
+            if (!items.length) continue;
+            html += `<div class="group-title">${GROUP_LABELS[g]}</div><div class="form-grid">`;
+            for (const it of items) {
+                html += `<div class="field"><label>${escapeHtml(it.label)}</label>
+                    <input type="text" value="${escapeHtml(it.value)}" readonly></div>`;
+            }
+            html += `</div>`;
+        }
+        if (!html) html = `<div class="result-empty"><p>No se detectaron campos conocidos.</p></div>`;
+        out.innerHTML = html;
+
+        const rawPreview = $("#rawPreview");
+        const rawDetails = $("#rawDetails");
+        if (rawPreview) rawPreview.textContent = raw;
+        if (rawDetails) rawDetails.style.display = "block";
+    }
+
+    function fillForm(data) {
+        let filled = 0;
+        for (const prefix of Object.keys(AAMVA_FIELDS)) {
+            const input = $("#gen_" + prefix);
+            if (input && data[prefix] !== undefined) {
+                input.value = data[prefix];
+                validateInput(input);
+                filled++;
+            }
+        }
+        console.log("[IDScan] inputs rellenados:", filled);
+        return filled;
+    }
+
+    function handleDecoded(raw) {
+        const { data, iin } = parseAAMVA(raw);
+        console.log("[IDScan] decode ->", Object.keys(data));
+        if (iin) setIIN(iin);
+        renderRead(data, raw);
+        fillForm(data);
+        setStatus(`✅ Leído · ${Object.keys(data).length} campos detectados`, "ok");
+        toast("Licencia leída correctamente", "success");
+    }
+
+    function makeReader() {
+        if (typeof ZXing === "undefined") {
+            throw new Error("ZXing no está cargado. Revisa tu conexión a internet.");
+        }
+        const hints = new Map();
+        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+            ZXing.BarcodeFormat.PDF_417,
+            ZXing.BarcodeFormat.CODE_128,
+            ZXing.BarcodeFormat.QR_CODE
+        ]);
+        hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+        return new ZXing.BrowserMultiFormatReader(hints);
+    }
+
+    let activeReader = null;
+    let cameraActive = false;
+
+    async function startCamera() {
+        setStatus("Iniciando cámara…", "active");
+        try {
+            activeReader = makeReader();
+            await activeReader.decodeFromConstraints(
+                { video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } } },
+                $("#video"),
+                (result) => {
+                    if (result) {
+                        console.log("[IDScan] cámara detectó:", result.getText().slice(0, 60));
+                        handleDecoded(result.getText());
+                        stopCamera();
+                    }
+                }
+            );
+            cameraActive = true;
+            $("#video").style.display = "block";
+            $("#videoPlaceholder").style.display = "none";
+            $("#videoFrame").classList.add("active");
+            $("#startBtn").disabled = true;
+            $("#stopBtn").disabled = false;
+            setStatus("Apunta al código de barras…", "active");
+        } catch (e) {
+            console.error("[IDScan] error cámara:", e);
+            setStatus("Error de cámara: " + e.message, "err");
+            toast("No se pudo acceder a la cámara", "error");
+        }
+    }
+
+    function stopCamera() {
+        if (activeReader) {
+            try { activeReader.reset(); } catch (e) {}
+            activeReader = null;
+        }
+        cameraActive = false;
+        const v = $("#video");
+        if (v) v.style.display = "none";
+        const vp = $("#videoPlaceholder");
+        if (vp) vp.style.display = "flex";
+        const vf = $("#videoFrame");
+        if (vf) vf.classList.remove("active");
+        const sb = $("#startBtn"), st = $("#stopBtn");
+        if (sb) sb.disabled = false;
+        if (st) st.disabled = true;
+        setStatus("Cámara detenida");
+    }
+
+    async function handleFile(file) {
+        setStatus("Procesando imagen…", "active");
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = async () => {
+            try {
+                const r = makeReader();
+                const result = await r.decodeFromImageElement(img);
+                handleDecoded(result.getText());
+                r.reset();
+            } catch (e1) {
+                console.warn("[IDScan] intento 1 falló:", e1);
+                try {
+                    const c = document.createElement("canvas");
+                    const scale = Math.min(2000 / img.width, 2000 / img.height, 1);
+                    c.width = img.width * scale;
+                    c.height = img.height * scale;
+                    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+                    const r2 = makeReader();
+                    const result = await r2.decodeFromCanvas(c);
+                    handleDecoded(result.getText());
+                    r2.reset();
+                } catch (e2) {
+                    console.error("[IDScan] intento 2 falló:", e2);
+                    setStatus("❌ No se pudo leer el código de la imagen.", "err");
+                    toast("Prueba con una foto más nítida y recortada", "warning");
+                }
+            }
+            URL.revokeObjectURL(url);
+        };
+        img.onerror = () => setStatus("❌ Imagen inválida", "err");
+        img.src = url;
+    }
+
+    function parseAndFill() {
+        console.log("[paste] botón pulsado");
+        const pasteInput = $("#pasteInput");
+        const pasteStatus = $("#pasteStatus");
+        if (!pasteInput || !pasteStatus) {
+            console.error("[paste] faltan elementos del DOM");
+            return;
+        }
+        const raw = pasteInput.value;
+        console.log("[paste] longitud:", raw.length, "| preview:", JSON.stringify(raw.slice(0, 80)));
+
+        if (!raw.trim()) {
+            pasteStatus.textContent = "❌ Pega primero un texto AAMVA.";
+            pasteStatus.className = "status err";
+            return;
+        }
+
+        const { data, iin } = parseAAMVA(raw);
+        console.log("[paste] campos detectados:", Object.keys(data));
+        console.log("[paste] IIN:", iin);
+
+        const known = Object.keys(AAMVA_FIELDS).filter(k => data[k] !== undefined);
+        if (!known.length) {
+            pasteStatus.textContent = "⚠️ No se detectaron campos AAMVA. Revisa el formato.";
+            pasteStatus.className = "status err";
+            toast("No se detectaron campos válidos", "warning");
+            return;
+        }
+
+        if (iin) setIIN(iin);
+        const filled = fillForm(data);
+        renderRead(data, raw);
+
+        pasteStatus.textContent = `✅ ${known.length} campos detectados · ${filled} inputs rellenados${iin ? " · IIN " + iin : ""}`;
+        pasteStatus.className = "status ok";
+        toast("Formulario rellenado desde texto", "success");
+        setStatus("✅ Datos importados desde texto pegado", "ok");
+
+        const genCard = $("#genForm")?.closest(".card");
+        if (genCard) genCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function buildAAMVAPayload() {
+        const values = {};
+        for (const prefix of Object.keys(AAMVA_FIELDS)) {
+            const input = $("#gen_" + prefix);
+            if (input && input.value.trim() !== "") values[prefix] = input.value.trim();
+        }
+        const missing = [];
+        for (const [prefix, info] of Object.entries(AAMVA_FIELDS)) {
+            if (info.required && !values[prefix]) missing.push(info.label);
+        }
+        if (missing.length) throw new Error("Faltan obligatorios: " + missing.join(", "));
+
+        const order = ["DCS","DAC","DAD","DBB","DBA","DBD","DBC","DAY","DAU","DAW","DAZ","DCL",
+                       "DAG","DAI","DAJ","DAK","DCG","DAQ","DCF","DCK","DDA","DDB",
+                       "DDL","DDK","DDJ","DCB","DCD"];
+        const lines = [];
+        for (const p of order) if (values[p]) lines.push(p + values[p]);
+        const subfile = lines.join("\n") + "\r";
+        const header = "@\n\x1e\rANSI " + currentIIN + "100001";
+        const offset = header.length + 10;
+        const pad = (n, w) => String(n).padStart(w, "0");
+        const designator = "DL" + pad(offset, 4) + pad(subfile.length, 4);
+        return header + designator + subfile;
+    }
+
+    async function generateBarcode() {
+        const canvas = $("#barcodeCanvas");
+        const btn = $("#generateBtn");
+        if (typeof bwipjs === "undefined") {
+            toast("bwip-js no cargó. Revisa tu conexión.", "error", 5000);
+            return;
+        }
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Generando…';
+        try {
+            const payload = buildAAMVAPayload();
+            const payloadPreview = $("#payloadPreview");
+            const payloadDetails = $("#payloadDetails");
+            if (payloadPreview) payloadPreview.textContent = payload;
+            if (payloadDetails) payloadDetails.style.display = "block";
+
+            await bwipjs.toCanvas(canvas, {
+                bcid: "pdf417",
+                text: payload,
+                scale: 4,
+                rowmult: 3,
+                eclevel: 5,
+                paddingwidth: 4,
+                paddingheight: 4,
+                backgroundcolor: "FFFFFF",
+                barcolor: "000000"
+            });
+            $("#barcodePreview").style.display = "block";
+            $("#downloadBtn").disabled = false;
+            $("#printBtn").disabled = false;
+            $("#saveHistoryBtn").disabled = false;
+            toast("Código generado", "success");
+        } catch (err) {
+            console.error("[IDScan] error generando:", err);
+            toast(err.message, "error", 4500);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = "🎨 Generar código";
+        }
+    }
+
+    function loadHistory() {
+        try { return JSON.parse(safeStorage.get(STORAGE_KEY) || "[]"); }
+        catch { return []; }
+    }
+    function saveHistory(h) { safeStorage.set(STORAGE_KEY, JSON.stringify(h)); }
+
+    function renderHistory() {
+        const list = $("#historyList");
+        if (!list) return;
+        const h = loadHistory();
+        if (!h.length) {
+            list.innerHTML = `<div class="history-empty">No hay licencias guardadas aún.</div>`;
+            return;
+        }
+        list.innerHTML = h.map((item, i) => `
+            <div class="history-item" data-index="${i}">
+                <div>
+                    <div class="name">${escapeHtml(item.fields.DCS || "Sin nombre")}, ${escapeHtml(item.fields.DAC || "")}</div>
+                    <div class="meta">${escapeHtml(item.fields.DAQ || "")} · IIN ${item.iin || DEFAULT_IIN}</div>
+                </div>
+                <div style="display:flex;gap:6px">
+                    <button class="btn btn-ghost btn-sm" data-load="${i}">Cargar</button>
+                    <button class="btn btn-ghost btn-sm" data-del="${i}">🗑</button>
+                </div>
+            </div>`).join("");
+
+        list.querySelectorAll("[data-load]").forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const item = loadHistory()[+btn.dataset.load];
+                if (!item) return;
+                setIIN(item.iin || DEFAULT_IIN);
+                for (const p of Object.keys(AAMVA_FIELDS)) {
+                    const input = $("#gen_" + p);
+                    if (input) { input.value = item.fields[p] || ""; validateInput(input); }
+                }
+                toast("Datos cargados al formulario", "success");
+            };
+        });
+        list.querySelectorAll("[data-del]").forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const h2 = loadHistory();
+                h2.splice(+btn.dataset.del, 1);
+                saveHistory(h2);
+                renderHistory();
+                toast("Entrada eliminada", "info");
+            };
+        });
+    }
+
+    function init() {
+        console.log("[IDScan] init()");
+
+        applyTheme(safeStorage.get(THEME_KEY) || "dark"); // Por defecto oscuro por el estilo La Orden
+        const themeBtn = $("#themeToggle");
+        if (themeBtn) {
+            themeBtn.onclick = () => {
+                applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+            };
+        }
+
+        $$(".tab").forEach(tab => {
+            tab.onclick = () => {
+                $$(".tab").forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+                const src = tab.dataset.source;
+                const cam = $("#cameraPane"), fil = $("#filePane");
+                if (cam) cam.style.display = src === "camera" ? "block" : "none";
+                if (fil) fil.style.display = src === "file" ? "block" : "none";
+            };
+        });
+
+        buildForm();
+
+        const startBtn = $("#startBtn"), stopBtn = $("#stopBtn");
+        if (startBtn) startBtn.onclick = startCamera;
+        if (stopBtn) stopBtn.onclick = stopCamera;
+
+        const dropZone = $("#dropZone"), fileInput = $("#fileInput");
+        if (dropZone && fileInput) {
+            dropZone.onclick = () => fileInput.click();
+            dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add("dragover"); };
+            dropZone.ondragleave = () => dropZone.classList.remove("dragover");
+            dropZone.ondrop = (e) => {
+                e.preventDefault();
+                dropZone.classList.remove("dragover");
+                if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+            };
+            fileInput.onchange = (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); };
+        }
+
+        const parsePasteBtn = $("#parsePasteBtn");
+        if (parsePasteBtn) {
+            parsePasteBtn.onclick = parseAndFill;
+            console.log("[IDScan] listener de 'Analizar' asignado");
+        } else {
+            console.error("[IDScan] NO existe #parsePasteBtn");
+        }
+
+        const pasteClipBtn = $("#pasteFromClipboardBtn");
+        if (pasteClipBtn) {
+            pasteClipBtn.onclick = async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    $("#pasteInput").value = text;
+                    const ps = $("#pasteStatus");
+                    ps.textContent = "📋 Texto pegado. Pulsa «Analizar».";
+                    ps.className = "status active";
+                } catch (e) {
+                    const ps = $("#pasteStatus");
+                    ps.textContent = "❌ No se pudo leer el portapapeles.";
+                    ps.className = "status err";
+                }
+            };
+        }
+
+        const clearPasteBtn = $("#clearPasteBtn");
+        if (clearPasteBtn) {
+            clearPasteBtn.onclick = () => {
+                $("#pasteInput").value = "";
+                const ps = $("#pasteStatus");
+                ps.textContent = "Esperando texto…";
+                ps.className = "status";
+            };
+        }
+
+        const genBtn = $("#generateBtn");
+        if (genBtn) genBtn.onclick = generateBarcode;
+
+        const dlBtn = $("#downloadBtn");
+        if (dlBtn) {
+            dlBtn.onclick = () => {
+                const link = document.createElement("a");
+                link.download = "licencia_pdf417.png";
+                link.href = $("#barcodeCanvas").toDataURL("image/png");
+                link.click();
+                toast("Imagen descargada", "success");
+            };
+        }
+
+        const printBtn = $("#printBtn");
+        if (printBtn) {
+            printBtn.onclick = () => {
+                const win = window.open("", "_blank");
+                win.document.write(`<html><head><title>Imprimir</title>
+                    <style>body{display:flex;justify-content:center;padding:20px}img{max-width:100%}</style>
+                    </head><body><img src="${$("#barcodeCanvas").toDataURL('image/png')}"
+                    onload="window.print()"></body></html>`);
+                win.document.close();
+            };
+        }
+
+        const saveHistBtn = $("#saveHistoryBtn");
+        if (saveHistBtn) {
+            saveHistBtn.onclick = () => {
+                const fields = {};
+                for (const p of Object.keys(AAMVA_FIELDS)) {
+                    const input = $("#gen_" + p);
+                    if (input && input.value.trim()) fields[p] = input.value.trim();
+                }
+                if (!fields.DCS && !fields.DAC) return toast("Faltan datos para guardar", "warning");
+                const h = loadHistory();
+                h.unshift({ iin: currentIIN, fields, ts: Date.now() });
+                saveHistory(h.slice(0, 20));
+                renderHistory();
+                toast("Guardado en historial", "success");
+            };
+        }
+
+        const clearHistBtn = $("#clearHistoryBtn");
+        if (clearHistBtn) {
+            clearHistBtn.onclick = () => {
+                if (!confirm("¿Borrar todo el historial?")) return;
+                saveHistory([]);
+                renderHistory();
+                toast("Historial borrado", "info");
+            };
+        }
+
+        const clearReadBtn = $("#clearReadBtn");
+        if (clearReadBtn) {
+            clearReadBtn.onclick = () => {
+                $("#readOutput").innerHTML = `<div class="result-empty" style="text-align:center; padding:30px; color:var(--muted);">
+                    <div style="font-size:36px; opacity:0.5; margin-bottom:10px;">🔍</div>
+                    <p>Los datos aparecerán aquí.</p></div>`;
+                $("#rawDetails").style.display = "none";
+                setStatus("Esperando escaneo…");
+            };
+        }
+
+        const exportBtn = $("#exportJsonBtn");
+        if (exportBtn) {
+            exportBtn.onclick = () => {
+                const data = { iin: currentIIN, fields: {} };
+                for (const prefix of Object.keys(AAMVA_FIELDS)) {
+                    const input = $("#gen_" + prefix);
+                    if (input && input.value.trim()) data.fields[prefix] = input.value.trim();
+                }
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+                const link = document.createElement("a");
+                link.download = "licencia.json";
+                link.href = URL.createObjectURL(blob);
+                link.click();
+                toast("JSON exportado", "success");
+            };
+        }
+
+        const importBtn = $("#importJsonBtn");
+        const importInput = $("#importJsonInput");
+        if (importBtn && importInput) {
+            importBtn.onclick = () => importInput.click();
+            importInput.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    const data = JSON.parse(await file.text());
+                    if (data.iin) setIIN(data.iin);
+                    for (const [p, v] of Object.entries(data.fields || {})) {
+                        const input = $("#gen_" + p);
+                        if (input) { input.value = v; validateInput(input); }
+                    }
+                    toast("JSON importado", "success");
+                } catch { toast("JSON inválido", "error"); }
+            };
+        }
+
+        renderHistory();
+        console.log("[IDScan] init completo ✅");
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+
+})();
+</script>
+</body>
+</html>
